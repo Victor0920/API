@@ -7,7 +7,7 @@ const publishBotMessage = async (
   message,
   language = "es-ES"
 ) => {
-  const response = await dialogflowService.executeQueries(
+  const response = await dialogflowService.sendMessage(
     "b-vision-1-kxqg",
     "user",
     [message],

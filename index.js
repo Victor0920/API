@@ -1,7 +1,8 @@
-const express = require("express");
-const logger = require("morgan");
-const errorhandler = require("errorhandler");
-const dialogflowService = require("./src/services/external/dialogflow");
+"use strict";
+
+require("./src/env");
+
+const mongoose = require("mongoose");
 
 const app = require("./src/app");
 

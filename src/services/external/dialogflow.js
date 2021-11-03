@@ -1,6 +1,4 @@
 const dialogflow = require("@google-cloud/dialogflow");
-const dotenv = require("dotenv");
-dotenv.config();
 
 const sessionClient = new dialogflow.SessionsClient();
 
@@ -39,30 +37,29 @@ async function detectIntent(
   return responses[0];
 }
 
-module.exports = {
-  executeQueries: async (projectId, sessionId, queries, languageCode) => {
-    // Keeping the context across queries let's us simulate an ongoing conversation with the bot
-    let context;
-    let intentResponse;
-    for (const query of queries) {
-      try {
-        intentResponse = await detectIntent(
-          projectId,
-          sessionId,
-          query,
-          context,
-          languageCode
-        );
-        console.log(
-          `Fulfillment Text: ${intentResponse.queryResult.fulfillmentText}`
-        );
-        // Use the context from this response for next queries
-        context = intentResponse.queryResult.outputContexts;
+async function sendMessage(projectId, sessionId, queries, languageCode) {
+  // Keeping the context across queries let's us simulate an ongoing conversation with the bot
+  let context;
+  let intentResponse;
+  for (const query of queries) {
+    try {
+      intentResponse = await detectIntent(
+        projectId,
+        sessionId,
+        query,
+        context,
+        languageCode
+      );
+      // Use the context from this response for next queries
+      context = intentResponse.queryResult.outputContexts;
 
-        return intentResponse;
-      } catch (error) {
-        console.log(error);
-      }
+      return intentResponse;
+    } catch (error) {
+      console.log(error);
     }
-  },
+  }
+}
+
+module.exports = {
+  sendMessage,
 };
