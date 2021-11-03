@@ -3,7 +3,7 @@
 const express = require("express");
 const router = express.Router();
 
-const controller = requirxe("../controllers/message");
+const controller = require("../controllers/message");
 // const allowAuthenticated = require('../middlewares/allowAuthenticated');
 
 // const {
