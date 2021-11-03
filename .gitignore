@@ -1,0 +1,7 @@
+.env
+.DS_Store
+globalConfig.json
+
+node_modules/*
+.vscode/settings.json
+package-lock.json
