@@ -3,12 +3,17 @@
 const messageService = require("../services/message");
 
 const insertOne = async (req, res) => {
-  const text = req.body.text;
   try {
+    const userId = req.body.userId;
+    const language = req.body.language;
+    const typeOfMessage = req.body.message.type;
+    const message = req.body.message.message;
+
     const response = await messageService.publishBotMessage(
-      "user_0",
-      text,
-      "es-ES"
+      userId,
+      message,
+      language,
+      typeOfMessage
     );
 
     return res.json(response);
