@@ -45,6 +45,9 @@ const publishBotMessage = async (user, message, language, typeOfMessage) => {
       audio: audioBase64,
     },
     payload,
+    request: {
+      text: response.queryResult.queryText,
+    },
   };
 
   return botMessage;
