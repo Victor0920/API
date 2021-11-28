@@ -14,9 +14,18 @@ const TupperSchema = new mongoose.Schema({
 const UserSchema = new mongoose.Schema({
   name: { type: String },
   phone: { type: String },
+  email: { type: String },
   updatedAt: { type: Date },
-  createdAt: { type: Date },
+  createdAt: {
+    type: Date,
+    default: () => Date.now(),
+  },
   storedFood: [TupperSchema],
+});
+
+UserSchema.pre("save", function (next) {
+  this.updatedAt = Date.now();
+  next();
 });
 
 module.exports = mongoose.model("User", UserSchema);

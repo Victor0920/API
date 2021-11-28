@@ -3,7 +3,7 @@
 const express = require("express");
 const router = express.Router();
 
-const controller = require("../controllers/message");
+const controller = require("../controllers/user");
 // const allowAuthenticated = require('../middlewares/allowAuthenticated');
 
 // const {
@@ -19,10 +19,10 @@ const controller = require("../controllers/message");
 // );
 
 router.post(
-  "/messages",
+  "/user",
   // allowAuthenticated,
   // postBodyValidator,
-  controller.postMessages // Name not clear
+  controller.insertOne
 );
 
 module.exports = router;

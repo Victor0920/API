@@ -1,14 +1,19 @@
+"use strict";
+
 const dialogflow = require("@google-cloud/dialogflow");
 
-const sessionClient = new dialogflow.SessionsClient();
+async function detectIntent(bot, sessionId, queryInput, contexts, audio64) {
+  const projectId = bot.project_id;
+  const credentials = {
+    client_email: bot.client_email,
+    private_key: bot.private_key,
+  };
 
-async function detectIntent(
-  projectId,
-  sessionId,
-  queryInput,
-  contexts,
-  audio64
-) {
+  const sessionClient = new dialogflow.SessionsClient({
+    projectId,
+    credentials,
+  });
+
   const sessionPath = sessionClient.projectAgentSessionPath(
     projectId,
     sessionId
@@ -25,7 +30,7 @@ async function detectIntent(
       inputAudio: audio64,
       outputAudioConfig: {
         audioEncoding: `OUTPUT_AUDIO_ENCODING_LINEAR_16`,
-        sampleRateHertz: 44100
+        sampleRateHertz: 44100,
       },
     };
   }
@@ -41,7 +46,7 @@ async function detectIntent(
   return responses[0];
 }
 
-async function sendTextMessage(projectId, sessionId, text, languageCode) {
+async function sendTextMessage(bot, sessionId, text, languageCode) {
   let context;
   let intentResponse;
 
@@ -53,12 +58,7 @@ async function sendTextMessage(projectId, sessionId, text, languageCode) {
   };
 
   try {
-    intentResponse = await detectIntent(
-      projectId,
-      sessionId,
-      queryInput,
-      context
-    );
+    intentResponse = await detectIntent(bot, sessionId, queryInput, context);
     // Use the context from this response for next queries
     context = intentResponse.queryResult.outputContexts;
 
@@ -68,7 +68,7 @@ async function sendTextMessage(projectId, sessionId, text, languageCode) {
   }
 }
 
-async function sendAudioMessage(projectId, sessionId, audio64, languageCode) {
+async function sendAudioMessage(bot, sessionId, audio64, languageCode) {
   let context;
   let intentResponse;
 
@@ -80,7 +80,7 @@ async function sendAudioMessage(projectId, sessionId, audio64, languageCode) {
 
   try {
     intentResponse = await detectIntent(
-      projectId,
+      bot,
       sessionId,
       queryInput,
       context,

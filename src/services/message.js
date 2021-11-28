@@ -2,14 +2,21 @@
 
 const dialogflowService = require("./external/dialogflow");
 
-const publishBotMessage = async (user, message, language, typeOfMessage) => {
+const publishBotMessage = async (
+  bot,
+  userId,
+  message,
+  language,
+  typeOfMessage
+) => {
+  const sessionId = userId;
   let response;
   let audioBase64 = null;
 
   if (typeOfMessage === "audio") {
     response = await dialogflowService.sendAudioMessage(
-      "b-vision-1-kxqg",
-      user,
+      bot,
+      sessionId,
       message,
       language
     );
@@ -19,8 +26,8 @@ const publishBotMessage = async (user, message, language, typeOfMessage) => {
     return { response, audioBase64 };
   } else if (typeOfMessage === "text") {
     response = await dialogflowService.sendTextMessage(
-      "b-vision-1-kxqg",
-      user,
+      bot,
+      sessionId,
       message,
       language
     );

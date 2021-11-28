@@ -1,17 +1,22 @@
 "use strict";
 
 const Message = require("../models/message");
+const Bot = require("../models/bot");
 
 const messageService = require("../services/message");
 
-const insertOne = async (req, res) => {
+const postMessages = async (req, res) => {
   try {
+    const botId = req.body.botId || "61a3d16b0ec2d91be729867a";
     const userId = req.body.userId;
     const language = req.body.language;
     const typeOfMessage = req.body.message.type;
     const message = req.body.message.message;
 
+    const bot = await Bot.findById(botId);
+
     const botResponse = await messageService.publishBotMessage(
+      bot,
       userId,
       message,
       language,
@@ -21,9 +26,24 @@ const insertOne = async (req, res) => {
     let insertedBotMessage;
     let insertedUserMessage;
 
+    // return res.json(botResponse); // Returns entity sys any
+
     if (botResponse) {
-      const queryResult = botResponse.response.queryResult;
+      const queryResult = botResponse.response
+        ? botResponse.response.queryResult
+        : botResponse.queryResult;
       const responseMessages = queryResult.fulfillmentMessages;
+      const intentName = queryResult.intent.displayName;
+      const payload = responseMessages.filter(
+        (messages) => messages.message === "payload"
+      )[0];
+
+      if (
+        intentName.includes("UPDATE-USER-INFO") ||
+        intentName.includes("UPDATE-USER-INFO") // chech for intent prefix
+      ) {
+        // Update user (User.updateOne). Maybe create tupper controller and extract tupper info intent
+      }
 
       insertedUserMessage = await new Message({
         messages: {
@@ -34,19 +54,19 @@ const insertOne = async (req, res) => {
         },
         sender_type: "User",
         sender: userId,
-        intent: queryResult.intent.displayName,
+        intent: intentName,
         speechConfidence: queryResult.speechRecognitionConfidence,
         language,
       });
       insertedUserMessage.save();
 
-      let payload = {};
-      for (const [key, value] of Object.entries(
-        responseMessages[1].payload.fields
-      )) {
-        const newPayload = {};
-        newPayload[key] = value.boolValue;
-        Object.assign(payload, newPayload);
+      let beautyPayload = {};
+      if (payload) {
+        for (const [key, value] of Object.entries(payload)) {
+          const newPayload = {};
+          newPayload[key] = value.boolValue;
+          Object.assign(beautyPayload, newPayload);
+        }
       }
 
       insertedBotMessage = await new Message({
@@ -55,7 +75,7 @@ const insertOne = async (req, res) => {
             text: responseMessages[0].text?.text[0],
             audio: botResponse.audioBase64,
           },
-          payload,
+          payload: payload ? beautyPayload : {},
         },
         sender_type: "Bot",
         sender: null, // Update with ObjectId of Bot Schema
@@ -78,5 +98,5 @@ const insertOne = async (req, res) => {
 };
 
 module.exports = {
-  insertOne,
+  postMessages,
 };
