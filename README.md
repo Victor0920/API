@@ -11,25 +11,87 @@ Api to connect de BVISION app with dialogflow and a ddbb
     npm start
     
 
-# REST API
+## Request & Response Examples
 
-The REST API to the example app is described below.
+### POST /device
+
+Example: `http://localhost:3000/api/device`
+
+Request body
+
+    {
+        "bot": "{bot-id}",
+        "model": "{device-model}"
+    }
+
+Response body
+
+    {
+        "device": {
+            "users": [],
+            "bot": "{bot-id}",
+            "model": "{device-model}",
+            "_id": "{device-id}",
+            "active_tuppers": [],
+        }
+    }
 
 
-## Send a message
+### POST /user
 
-### Request
+Example: `http://localhost:3000/api/user`
 
-`POST /api/message`
+Request body
 
-    curl --request POST 'http://localhost:3000/api/message' \
-         --header 'Content-Type: application/json' 'Authorization: {your-key}' \
-         --data-raw '{
-             "message": "{your-text}",
-             "type": "text",
-             "language": "es"
-         }'
+    {
+        "name": "{name}",
+        "phone": "{phone-number}",
+        "email": "{email}",
+        "device": "{device-id}"
+    }
 
-### Response
+Response body
 
-    {"message": "¡Hola! ¿Qué tal?"}
+    {
+        "user": {
+            "name": "{name}",
+            "phone": "{phone-number}",
+            "email": "{email}",
+            "device": "{device-id}",
+            "_id": "{user-id}",
+        }
+    }
+
+
+### POST /message
+
+Example: `http://localhost:3000/api/message`
+
+Request body
+
+    {
+        "message": {
+            "message": "{text-message}",
+            "type": "text"
+        },
+        "user": "{user-id}",
+        "language": "es-ES",
+        "saveInDb": true
+    }
+
+Response body
+
+    {
+        "request": {
+            "message": {
+                "audio": null,
+                "text": "{text-message}"
+            }
+        },
+        "response": {
+            "message": {
+                "text": "{text-response}"
+            },
+            "payload": {}
+        }
+    }
