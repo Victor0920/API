@@ -2,29 +2,29 @@
 
 const mongoose = require("mongoose");
 
-const TupperSchema = new mongoose.Schema({
-  description: { type: String },
-  createdAt: {
-    type: Date,
-    default: () => Date.now(),
-  },
-  createdBy: { type: String },
-});
+const ConversationSchema = require("./conversation");
 
 const UserSchema = new mongoose.Schema({
   name: { type: String },
   phone: { type: String },
   email: { type: String },
-  updatedAt: { type: Date },
-  createdAt: {
+  updated_at: { type: Date },
+  created_at: {
     type: Date,
     default: () => Date.now(),
   },
-  storedFood: [TupperSchema],
+  device: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: "UserSchema",
+  },
+  conversation: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: "ConversationSchema",
+  },
 });
 
 UserSchema.pre("save", function (next) {
-  this.updatedAt = Date.now();
+  this.updated_at = Date.now();
   next();
 });
 

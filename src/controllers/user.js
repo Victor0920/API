@@ -1,14 +1,21 @@
 "use strict";
 
 const User = require("../models/user");
+const Device = require("../models/device");
 
 const insertOne = async (req, res) => {
   try {
     const user = req.body;
-    console.log({ user });
+    const userDevice = await Device.findById(user.device);
+    let insertedUser;
 
-    const insertedUser = await new User(user);
-    insertedUser.save();
+    if (userDevice) {
+      insertedUser = await new User(user);
+      await insertedUser.save();
+
+      userDevice.users.push(insertedUser._id);
+      await userDevice.save();
+    }
 
     return res.json({ user: insertedUser });
   } catch (error) {
@@ -25,7 +32,7 @@ const updateOne = async (req, res) => {
 
     const user = await User.findById(userId);
     user[0] = { ...user[0], ...updatedUserFields };
-    user.save();
+    await user.save();
 
     return res.json({ user: user[0] });
   } catch (error) {

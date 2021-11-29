@@ -9,21 +9,10 @@ const mongoose = require("mongoose");
 mongoose.connect(
   "mongodb://localhost/bvision-bbdd",
   () => {
-    console.log("connected");
+    console.log("connected to db");
   },
   (e) => console.error(e)
 );
-
-// createUser();
-
-// async function createUser() {
-//   try {
-//     const user = await User.create({ name: "Kyle2", age: 25 });
-//     console.log(user);
-//   } catch (e) {
-//     console.log(e.message);
-//   }
-// }
 
 const app = require("./src/app");
 

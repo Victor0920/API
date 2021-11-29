@@ -4,25 +4,11 @@ const express = require("express");
 const router = express.Router();
 
 const controller = require("../controllers/user");
-// const allowAuthenticated = require('../middlewares/allowAuthenticated');
 
-// const {
-//     queryValidator,
-//     postBodyValidator,
-// } = require('../validators/message');
+const userRules = require("../middlewares/user");
 
-// router.get(
-//     '/messages',
-//     // allowAuthenticated,
-//     // queryValidator,
-//     controller.find,
-// );
+router.post("/user", userRules, controller.insertOne);
 
-router.post(
-  "/user",
-  // allowAuthenticated,
-  // postBodyValidator,
-  controller.insertOne
-);
+router.put("/user/:id", userRules, controller.updateOne);
 
 module.exports = router;

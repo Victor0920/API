@@ -1,17 +1,20 @@
 "use strict";
 
 const Message = require("../models/message");
+const User = require("../models/user");
 const Bot = require("../models/bot");
+const Conversation = require("../models/conversation");
 
 const messageService = require("../services/message");
 
 const postMessages = async (req, res) => {
   try {
     const botId = req.body.botId || "61a3d16b0ec2d91be729867a";
-    const userId = req.body.userId;
+    const userId = req.body.user;
     const language = req.body.language;
     const typeOfMessage = req.body.message.type;
     const message = req.body.message.message;
+    const saveUserMessageInDb = req.body.saveInDb;
 
     const bot = await Bot.findById(botId);
 
@@ -25,8 +28,7 @@ const postMessages = async (req, res) => {
 
     let insertedBotMessage;
     let insertedUserMessage;
-
-    // return res.json(botResponse); // Returns entity sys any
+    let insertedConversation;
 
     if (botResponse) {
       const queryResult = botResponse.response
@@ -38,11 +40,9 @@ const postMessages = async (req, res) => {
         (messages) => messages.message === "payload"
       )[0];
 
-      if (
-        intentName.includes("UPDATE-USER-INFO") ||
-        intentName.includes("UPDATE-USER-INFO") // chech for intent prefix
-      ) {
-        // Update user (User.updateOne). Maybe create tupper controller and extract tupper info intent
+      if (intentName.includes("UUI")) {
+        const tupperValue =
+          queryResult.parameters.fields.any.listValue.values[0].stringValue;
       }
 
       insertedUserMessage = await new Message({
@@ -55,10 +55,9 @@ const postMessages = async (req, res) => {
         sender_type: "User",
         sender: userId,
         intent: intentName,
-        speechConfidence: queryResult.speechRecognitionConfidence,
+        speech_confidence: queryResult.speechRecognitionConfidence,
         language,
       });
-      insertedUserMessage.save();
 
       let beautyPayload = {};
       if (payload) {
@@ -78,12 +77,42 @@ const postMessages = async (req, res) => {
           payload: payload ? beautyPayload : {},
         },
         sender_type: "Bot",
-        sender: null, // Update with ObjectId of Bot Schema
+        sender: botId,
         intent: queryResult.intent.displayName,
-        speechConfidence: queryResult.speechRecognitionConfidence,
+        speech_confidence: queryResult.speechRecognitionConfidence,
         language,
       });
-      insertedBotMessage.save();
+
+      insertedConversation = await Conversation.findOne({ user: userId });
+
+      if (!insertedConversation) {
+        insertedConversation = await new Conversation({
+          user: userId,
+          bot: botId,
+          messages: [],
+        });
+
+        const user = await User.findById(userId);
+
+        if (user) {
+          user.conversation = insertedConversation._id;
+          user.save();
+        }
+      }
+
+      insertedBotMessage.conversation = insertedConversation._id;
+      insertedUserMessage.conversation = insertedConversation._id;
+
+      if (saveUserMessageInDb) {
+        insertedConversation.messages.push(insertedUserMessage._id);
+
+        await insertedUserMessage.save();
+      }
+
+      insertedConversation.messages.push(insertedBotMessage._id);
+
+      await insertedBotMessage.save();
+      await insertedConversation.save();
     }
 
     return res.json({

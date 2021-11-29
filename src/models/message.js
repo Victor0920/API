@@ -1,6 +1,7 @@
 "use strict";
 
 const UserSchema = require("./user");
+const ConversationSchema = require("./conversation");
 const mongoose = require("mongoose");
 
 const MessageSchema = new mongoose.Schema({
@@ -8,6 +9,10 @@ const MessageSchema = new mongoose.Schema({
   sender: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "UserSchema",
+  },
+  conversation: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: "ConversationSchema",
   },
   messages: {
     message: {
@@ -18,7 +23,7 @@ const MessageSchema = new mongoose.Schema({
   },
   intent: { type: String },
   language: { type: String },
-  speechConfidence: { type: Number },
+  speech_confidence: { type: Number },
 });
 
 module.exports = mongoose.model("Message", MessageSchema);
