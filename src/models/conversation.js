@@ -5,31 +5,29 @@ const UserSchema = require("./user");
 const MessageSchema = require("./message");
 const mongoose = require("mongoose");
 
-const ConversationSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: "UserSchema",
-  },
-  bot: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: "BotSchema",
-  },
-  messages: [
-    {
+const ConversationSchema = new mongoose.Schema(
+  {
+    user: {
       type: mongoose.SchemaTypes.ObjectId,
-      ref: "MessageSchema",
+      ref: "UserSchema",
     },
-  ],
-  updated_at: { type: Date },
-  created_at: {
-    type: Date,
-    default: () => Date.now(),
+    bot: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "BotSchema",
+    },
+    messages: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "MessageSchema",
+      },
+    ],
   },
-});
-
-ConversationSchema.pre("save", function (next) {
-  this.updated_at = Date.now();
-  next();
-});
+  {
+    timestamps: {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
+  }
+);
 
 module.exports = mongoose.model("Conversation", ConversationSchema);

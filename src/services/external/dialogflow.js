@@ -59,7 +59,6 @@ async function sendTextMessage(bot, sessionId, text, languageCode) {
 
   try {
     intentResponse = await detectIntent(bot, sessionId, queryInput, context);
-    // Use the context from this response for next queries
     context = intentResponse.queryResult.outputContexts;
 
     return intentResponse;
@@ -86,7 +85,6 @@ async function sendAudioMessage(bot, sessionId, audio64, languageCode) {
       context,
       audio64
     );
-    // Use the context from this response for next queries
     context = intentResponse.queryResult.outputContexts;
 
     return intentResponse;

@@ -4,8 +4,6 @@ require("./src/env");
 
 const mongoose = require("mongoose");
 
-// const User = require("./src/models/user");
-
 mongoose.connect(
   "mongodb://localhost/bvision-bbdd",
   () => {
