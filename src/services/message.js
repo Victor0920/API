@@ -20,10 +20,6 @@ const publishBotMessage = async (
       message,
       language
     );
-
-    audioBase64 = Buffer.from(response.outputAudio).toString("base64");
-
-    return { response, audioBase64 };
   } else if (typeOfMessage === "text") {
     response = await dialogflowService.sendTextMessage(
       bot,
@@ -31,13 +27,15 @@ const publishBotMessage = async (
       message,
       language
     );
-
-    return response;
-  } else {
-    return res.status(400).send({
-      message: `message.type: '${typeOfMessage}' is not a valid argument`,
-    });
   }
+  // } else { // Move to validator
+  //   return res.status(400).send({
+  //     message: `message.type: '${typeOfMessage}' is not a valid argument`,
+  //   });
+  // }
+
+  audioBase64 = Buffer.from(response.outputAudio).toString("base64");
+  return { response, audioBase64 };
 };
 
 module.exports = {

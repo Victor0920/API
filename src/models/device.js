@@ -4,8 +4,12 @@ const mongoose = require("mongoose");
 
 const TupperSchema = new mongoose.Schema(
   {
-    description: { type: String },
-    created_by: { type: String },
+    code: { type: String },
+    value: { type: String },
+    created_by: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "UserSchema",
+    },
   },
   {
     timestamps: {

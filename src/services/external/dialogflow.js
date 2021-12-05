@@ -22,16 +22,16 @@ async function detectIntent(bot, sessionId, queryInput, contexts, audio64) {
   let request = {
     session: sessionPath,
     queryInput,
+    outputAudioConfig: {
+      audioEncoding: `OUTPUT_AUDIO_ENCODING_LINEAR_16`,
+      sampleRateHertz: 44100,
+    },
   };
 
   if (audio64) {
     request = {
       ...request,
       inputAudio: audio64,
-      outputAudioConfig: {
-        audioEncoding: `OUTPUT_AUDIO_ENCODING_LINEAR_16`,
-        sampleRateHertz: 44100,
-      },
     };
   }
 

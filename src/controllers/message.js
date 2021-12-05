@@ -4,6 +4,7 @@ const Message = require("../models/message");
 const User = require("../models/user");
 const Bot = require("../models/bot");
 const Conversation = require("../models/conversation");
+const Device = require("../models/device");
 
 const messageService = require("../services/message");
 
@@ -14,7 +15,8 @@ const postMessages = async (req, res) => {
     const language = req.body.language;
     const typeOfMessage = req.body.message.type;
     const message = req.body.message.message;
-    const saveUserMessageInDb = req.body.saveInDb;
+    const actions = req.body.actions;
+    // const saveUserMessageInDb = req.body.saveInDb;
 
     const bot = await Bot.findById(botId);
 
@@ -26,10 +28,13 @@ const postMessages = async (req, res) => {
       typeOfMessage
     );
 
+    // return res.json(botResponse);
+
     let insertedBotMessage;
     let insertedUserMessage;
     let insertedConversation;
 
+    // return res.json(botResponse);
     if (botResponse) {
       const queryResult = botResponse.response
         ? botResponse.response.queryResult
@@ -39,11 +44,6 @@ const postMessages = async (req, res) => {
       const payload = responseMessages.filter(
         (messages) => messages.message === "payload"
       )[0];
-
-      if (intentName.includes("UUI")) {
-        const tupperValue =
-          queryResult.parameters.fields.any.listValue.values[0].stringValue;
-      }
 
       insertedUserMessage = await new Message({
         messages: {
@@ -91,26 +91,48 @@ const postMessages = async (req, res) => {
           bot: botId,
           messages: [],
         });
+      }
 
-        const user = await User.findById(userId);
+      const user = await User.findById(userId);
 
-        if (user) {
-          user.conversation = insertedConversation._id;
-          user.save();
+      // console.log(user);
+
+      if (user) {
+        user.conversation = insertedConversation._id;
+        await user.save();
+
+        console.log(actions);
+
+        if (actions && actions.postTupper) {
+          const device = await Device.findById(user.device);
+          // return res.json(queryResult);
+          const tupperValue = queryResult.parameters.fields.any.stringValue;
+
+          console.log({ device });
+
+          device.active_tuppers.push({
+            code: actions.tupperCode,
+            value: tupperValue,
+            created_by: user._id,
+          });
+
+          console.log({
+            code: actions.tupperCode,
+            value: tupperValue,
+            created_by: user._id,
+          });
+
+          await device.save();
         }
       }
 
       insertedBotMessage.conversation = insertedConversation._id;
       insertedUserMessage.conversation = insertedConversation._id;
 
-      if (saveUserMessageInDb) {
-        insertedConversation.messages.push(insertedUserMessage._id);
-
-        await insertedUserMessage.save();
-      }
-
+      insertedConversation.messages.push(insertedUserMessage._id);
       insertedConversation.messages.push(insertedBotMessage._id);
 
+      await insertedUserMessage.save();
       await insertedBotMessage.save();
       await insertedConversation.save();
     }

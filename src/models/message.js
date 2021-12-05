@@ -1,7 +1,5 @@
 "use strict";
 
-const UserSchema = require("./user");
-const ConversationSchema = require("./conversation");
 const mongoose = require("mongoose");
 
 const MessageSchema = new mongoose.Schema(

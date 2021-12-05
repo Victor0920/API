@@ -1,8 +1,5 @@
 "use strict";
 
-const BotSchema = require("./bot");
-const UserSchema = require("./user");
-const MessageSchema = require("./message");
 const mongoose = require("mongoose");
 
 const ConversationSchema = new mongoose.Schema(
