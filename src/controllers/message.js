@@ -97,14 +97,30 @@ const postMessages = async (req, res) => {
 
         if (actions && actions.postTupper) {
           const device = await Device.findById(user.device);
-          // return res.json(queryResult);
           const tupperValue = queryResult.parameters.fields.any.stringValue;
 
-          device.active_tuppers.push({
-            qr_code: actions.QRCode,
-            value: tupperValue,
-            created_by: user._id,
-          });
+          const tupperWithSameQr = device.active_tuppers.find(
+            (tupper) => tupper.qr_code == actions.QRCode
+          );
+
+          if (tupperWithSameQr) {
+            const indexOfTupperWithSameQr = device.active_tuppers.findIndex(
+              (tupper) => tupper.qr_code == actions.QRCode
+            );
+
+            device.active_tuppers[indexOfTupperWithSameQr] = {
+              ...tupperWithSameQr,
+              qr_code: actions.QRCode,
+              value: tupperValue,
+              created_by: user._id,
+            };
+          } else {
+            device.active_tuppers.push({
+              qr_code: actions.QRCode,
+              value: tupperValue,
+              created_by: user._id,
+            });
+          }
 
           await device.save();
         }

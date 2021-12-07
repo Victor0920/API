@@ -35,8 +35,8 @@ const findAll = async (agent) => {
       for (const tupper of activeTuppers) {
         text += `El que contiene ${
           tupper.value
-        } fue almacenado el ${tupper.created_at.getDate()} de ${
-          months[tupper.created_at.getMonth() - 1]
+        } fue almacenado el ${tupper.updated_at.getDate()} de ${
+          months[tupper.updated_at.getMonth() - 1]
         }. `;
       }
     }
@@ -56,21 +56,20 @@ const findOne = async (agent) => {
 
     const device = await Device.findOne({ users: { $in: [userId] } });
 
-    const selectedTupper = device.active_tuppers.find((tupper) => {
-      console.log(tupper.qr_code, QRCode);
-      return tupper.qr_code == QRCode;
-    });
+    const selectedTupper = device.active_tuppers.find(
+      (tupper) => tupper.qr_code == QRCode
+    );
 
     let text;
 
     if (selectedTupper) {
       text = `Este táper contiene ${
         selectedTupper.value
-      } y fue guardado el ${selectedTupper.created_at.getDate()} de ${
-        months[selectedTupper.created_at.getMonth() - 1]
+      } y fue guardado el ${selectedTupper.updated_at.getDate()} de ${
+        months[selectedTupper.updated_at.getMonth() - 1]
       }.`;
     } else {
-      text = "Este taper todavía no está registrado.";
+      text = "Este táper todavía no está registrado.";
     }
 
     agent.add(text);
@@ -88,25 +87,42 @@ const deleteOne = async (agent) => {
 
     const device = await Device.findOne({ users: { $in: [userId] } });
 
-    const selectedTupper = device.active_tuppers.find((tupper) => {
-      console.log(tupper.qr_code, QRCode);
-      return tupper.qr_code == QRCode;
-    });
+    const selectedTupper = device.active_tuppers.find(
+      (tupper) => tupper.qr_code == QRCode
+    );
 
     let text;
 
     if (selectedTupper) {
-      text = `Este táper que contenía ${selectedTupper.value} ha sido eliminado.`;
-
-      await Device.updateOne(
-        { users: { $in: [userId] } },
-        { $pull: { active_tuppers: { qr_code: QRCode } } }
+      const removeIndex = device.active_tuppers.findIndex(
+        (tupper) => tupper.qr_code == QRCode
       );
+      device.active_tuppers.splice(removeIndex, 1);
+      await device.save();
+
+      text = `Este táper que contenía ${selectedTupper.value} ha sido eliminado.`;
     } else {
-      text = "Este taper no estaba registrado.";
+      text = "Este táper no estaba registrado.";
     }
 
     agent.add(text);
+  } catch (error) {
+    agent.add(
+      "Ha habido un error en la búsqueda de tápers. Inténtalo de nuevo más tarde."
+    );
+  }
+};
+
+const deleteAll = async (agent) => {
+  try {
+    const userId = agent.context.session.split("/").slice(-1);
+
+    await Device.updateOne(
+      { users: { $in: [userId] } },
+      { $set: { active_tuppers: [] } }
+    );
+
+    agent.add("La información de todos los tápers han sido borrada");
   } catch (error) {
     agent.add(
       "Ha habido un error en la búsqueda de tápers. Inténtalo de nuevo más tarde."
@@ -118,4 +134,5 @@ module.exports = {
   findAll,
   findOne,
   deleteOne,
+  deleteAll,
 };

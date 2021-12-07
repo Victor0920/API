@@ -34,6 +34,8 @@ const handler = async (req, res) => {
     tupperService.deleteOne
   );
 
+  intentMap.set("DELETE-TUPPERS-ALL-FWU-YES", tupperService.deleteAll);
+
   agent.handleRequest(intentMap);
 };
 
