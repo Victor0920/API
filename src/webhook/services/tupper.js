@@ -17,7 +17,7 @@ const months = [
 
 const Device = require("../../models/device");
 
-const getTupper = async (agent) => {
+const getAllTuppers = async (agent) => {
   try {
     const userId = agent.context.session.split("/").slice(-1);
     const device = await Device.findOne({ users: { $in: [userId] } });
@@ -49,6 +49,39 @@ const getTupper = async (agent) => {
   }
 };
 
+const getSpecificTupper = async (agent) => {
+  try {
+    const userId = agent.context.session.split("/").slice(-1);
+    const QRCode = agent.parameters.number;
+
+    const device = await Device.findOne({ users: { $in: [userId] } });
+
+    const selectedTupper = device.active_tuppers.find((tupper) => {
+      console.log(tupper.qr_code, QRCode);
+      return tupper.qr_code == QRCode;
+    });
+
+    let text;
+
+    if (selectedTupper) {
+      text = `Este táper contiene ${
+        selectedTupper.value
+      } y fue guardado el ${selectedTupper.created_at.getDate()} de ${
+        months[selectedTupper.created_at.getMonth() - 1]
+      }.`;
+    } else {
+      text = "Este taper todavía no está registrado.";
+    }
+
+    agent.add(text);
+  } catch (error) {
+    agent.add(
+      "Ha habido un error en la búsqueda de tápers. Inténtalo de nuevo más tarde."
+    );
+  }
+};
+
 module.exports = {
-  getTupper,
+  getAllTuppers,
+  getSpecificTupper,
 };

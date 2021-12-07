@@ -16,7 +16,6 @@ const postMessages = async (req, res) => {
     const typeOfMessage = req.body.message.type;
     const message = req.body.message.message;
     const actions = req.body.actions;
-    // const saveUserMessageInDb = req.body.saveInDb;
 
     const bot = await Bot.findById(botId);
 
@@ -28,13 +27,10 @@ const postMessages = async (req, res) => {
       typeOfMessage
     );
 
-    // return res.json(botResponse);
-
     let insertedBotMessage;
     let insertedUserMessage;
     let insertedConversation;
 
-    // return res.json(botResponse);
     if (botResponse) {
       const queryResult = botResponse.response
         ? botResponse.response.queryResult
@@ -61,7 +57,7 @@ const postMessages = async (req, res) => {
 
       let beautyPayload = {};
       if (payload) {
-        for (const [key, value] of Object.entries(payload)) {
+        for (const [key, value] of Object.entries(payload.payload.fields)) {
           const newPayload = {};
           newPayload[key] = value.boolValue;
           Object.assign(beautyPayload, newPayload);
@@ -95,29 +91,17 @@ const postMessages = async (req, res) => {
 
       const user = await User.findById(userId);
 
-      // console.log(user);
-
       if (user) {
         user.conversation = insertedConversation._id;
         await user.save();
-
-        console.log(actions);
 
         if (actions && actions.postTupper) {
           const device = await Device.findById(user.device);
           // return res.json(queryResult);
           const tupperValue = queryResult.parameters.fields.any.stringValue;
 
-          console.log({ device });
-
           device.active_tuppers.push({
-            code: actions.tupperCode,
-            value: tupperValue,
-            created_by: user._id,
-          });
-
-          console.log({
-            code: actions.tupperCode,
+            qr_code: actions.QRCode,
             value: tupperValue,
             created_by: user._id,
           });

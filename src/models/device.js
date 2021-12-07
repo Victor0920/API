@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 
 const TupperSchema = new mongoose.Schema(
   {
-    code: { type: String },
+    qr_code: { type: String },
     value: { type: String },
     created_by: {
       type: mongoose.SchemaTypes.ObjectId,
