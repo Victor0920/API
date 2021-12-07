@@ -22,11 +22,16 @@ const handler = async (req, res) => {
 
   let intentMap = new Map();
 
-  intentMap.set("GET-TUPPERS-INFO-ALL", tupperService.getAllTuppers);
+  intentMap.set("GET-TUPPERS-INFO-ALL", tupperService.findAll);
 
   intentMap.set(
     "GET-TUPPER-INFO-SPECIFIC-FWU-CAM-SUCCESS",
-    tupperService.getSpecificTupper
+    tupperService.findOne
+  );
+
+  intentMap.set(
+    "DELETE-TUPPER-SPECIFIC-FWU-CAM-SUCCESS",
+    tupperService.deleteOne
   );
 
   agent.handleRequest(intentMap);
