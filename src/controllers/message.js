@@ -15,7 +15,6 @@ const postMessages = async (req, res) => {
     const language = req.body.language;
     const typeOfMessage = req.body.message.type;
     const message = req.body.message.message;
-    const actions = req.body.actions;
 
     const bot = await Bot.findById(botId);
 
@@ -94,36 +93,6 @@ const postMessages = async (req, res) => {
       if (user) {
         user.conversation = insertedConversation._id;
         await user.save();
-
-        if (actions && actions.postTupper) {
-          const device = await Device.findById(user.device);
-          const tupperValue = queryResult.parameters.fields.any.stringValue;
-
-          const tupperWithSameQr = device.active_tuppers.find(
-            (tupper) => tupper.qr_code == actions.QRCode
-          );
-
-          if (tupperWithSameQr) {
-            const indexOfTupperWithSameQr = device.active_tuppers.findIndex(
-              (tupper) => tupper.qr_code == actions.QRCode
-            );
-
-            device.active_tuppers[indexOfTupperWithSameQr] = {
-              ...tupperWithSameQr,
-              qr_code: actions.QRCode,
-              value: tupperValue,
-              created_by: user._id,
-            };
-          } else {
-            device.active_tuppers.push({
-              qr_code: actions.QRCode,
-              value: tupperValue,
-              created_by: user._id,
-            });
-          }
-
-          await device.save();
-        }
       }
 
       insertedBotMessage.conversation = insertedConversation._id;
