@@ -35,7 +35,7 @@ const postMessages = async (req, res) => {
         ? botResponse.response.queryResult
         : botResponse.queryResult;
       const responseMessages = queryResult.fulfillmentMessages;
-      const intentName = queryResult.intent.displayName;
+      const intentName = queryResult.intent.displayName || "";
       const payload = responseMessages.filter(
         (messages) => messages.message === "payload"
       )[0];
@@ -66,7 +66,9 @@ const postMessages = async (req, res) => {
       insertedBotMessage = await new Message({
         messages: {
           message: {
-            text: responseMessages[0].text?.text[0],
+            text: responseMessages[0].text
+              ? responseMessages[0].text.text[0]
+              : "",
             audio: botResponse.audioBase64,
           },
           payload: payload ? beautyPayload : {},
@@ -111,6 +113,7 @@ const postMessages = async (req, res) => {
       response: insertedBotMessage.messages,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).send({
       message: error.toString(),
     });
