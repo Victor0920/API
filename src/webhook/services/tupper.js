@@ -19,7 +19,6 @@ const Device = require("../../models/device");
 
 const insertOne = async (agent) => {
   try {
-    // console.log(agent);
     console.log(agent.contexts);
     const userId = agent.context.session.split("/").slice(-1);
     const context = agent.contexts[0];
