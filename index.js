@@ -5,7 +5,6 @@ require("./src/env");
 const mongoose = require("mongoose");
 
 mongoose.connect(
-  // "mongodb://localhost/bvision-bbdd",
   "mongodb+srv://bvision-user:bvision-password@bvisioncluster.ha3na.mongodb.net/bvision-bbdd?retryWrites=true&w=majority",
   () => {
     console.log("connected to db");
@@ -15,4 +14,6 @@ mongoose.connect(
 
 const app = require("./src/app");
 
-app.listen(3000);
+app.listen(8081, () => {
+  console.log("Server initialized!");
+});
