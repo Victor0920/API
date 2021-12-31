@@ -51,7 +51,6 @@ const insertOne = async (agent) => {
         created_by: userId,
       });
     }
-    console.log("3", device);
 
     await device.save();
 
@@ -77,25 +76,26 @@ const findAll = async (agent) => {
     if (activeTuppers.length === 0) {
       text = "Ahora mismo no tienes ningún táper almacenado.";
     } else {
-      text = `Ahora mismo tienes ${activeTuppers.length} tápers ${
-        activeTuppers.length > 1 ? "almacenados" : "almacenado"
+      text = `Ahora mismo tienes ${
+        activeTuppers.length > 1
+          ? activeTuppers.length + " tápers almacenados"
+          : "un táper almacenado"
       }. `;
 
       let groupedTuppers = [];
-      console.log(activeTuppers);
 
       for (const tupper of activeTuppers) {
         if (
           activeTuppers.filter(
             (t) =>
-              t.updated_at.toString().split("T")[0] ===
-              tupper.updated_at.toString().split("T")[0]
+              t.updated_at.toISOString().split("T")[0] ===
+              tupper.updated_at.toISOString().split("T")[0]
           ).length > 1
         ) {
           const tupperWithSameDate = activeTuppers.filter((t) => {
             if (
-              t.updated_at.toString().split("T")[0] ===
-                tupper.updated_at.toString().split("T")[0] &&
+              t.updated_at.toISOString().split("T")[0] ===
+                tupper.updated_at.toISOString().split("T")[0] &&
               t.qr_code != tupper.qr_code
             ) {
               return t;
@@ -105,8 +105,8 @@ const findAll = async (agent) => {
           if (
             groupedTuppers.filter(
               (t) =>
-                t.date.toString().split("T")[0] ===
-                tupper.updated_at.toString().split("T")[0]
+                t.date.toISOString().split("T")[0] ===
+                tupper.updated_at.toISOString().split("T")[0]
             ).length === 0
           ) {
             groupedTuppers.push({
@@ -120,8 +120,6 @@ const findAll = async (agent) => {
             values: [tupper.value],
           });
         }
-
-        console.log("g", groupedTuppers);
       }
 
       for (const tupper of groupedTuppers) {
@@ -215,7 +213,7 @@ const deleteOne = async (agent) => {
     agent.add(text);
   } catch (error) {
     agent.add(
-      "Ha habido un error en la búsqueda de tápers. Inténtalo de nuevo más tarde."
+      "Ha habido un error en el borrado del táper. Inténtalo de nuevo más tarde."
     );
   }
 };
@@ -232,7 +230,7 @@ const deleteAll = async (agent) => {
     agent.add("La información de todos los tápers ha sido eliminada");
   } catch (error) {
     agent.add(
-      "Ha habido un error en la búsqueda de tápers. Inténtalo de nuevo más tarde."
+      "Ha habido un error en el borrado de los tápers. Inténtalo de nuevo más tarde."
     );
   }
 };

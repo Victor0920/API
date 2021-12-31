@@ -29,15 +29,10 @@ const updateOne = async (agent) => {
         }
       );
 
-    console.log(email);
-
     let user = await User.findById(userId);
-    console.log({ user });
     user.name = name;
     user.phone = phone;
     user.email = email;
-
-    console.log({ user });
 
     await user.save();
 
