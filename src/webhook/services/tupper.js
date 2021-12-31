@@ -200,7 +200,7 @@ const deleteOne = async (agent) => {
 
     if (selectedTupper) {
       const removeIndex = device.active_tuppers.findIndex(
-        (tupper) => tupper.qr_code == QRCode
+        (tupper) => tupper.qr_code == qrCode
       );
       device.active_tuppers.splice(removeIndex, 1);
       await device.save();
