@@ -2,6 +2,7 @@
 const { WebhookClient } = require("dialogflow-fulfillment");
 
 const tupperService = require("../services/tupper");
+const userService = require("../services/user");
 
 const handler = async (req, res) => {
   const agent = new WebhookClient({
@@ -10,6 +11,11 @@ const handler = async (req, res) => {
   });
 
   let intentMap = new Map();
+
+  intentMap.set(
+    "00_INIT_BOT-FWU-YES-NAME-PHONE-EMAIL-FINISH",
+    userService.updateOne
+  );
 
   intentMap.set("SAVE_NEW_TUPPER-FWU-FOOD-SUCCESS", tupperService.insertOne);
 
