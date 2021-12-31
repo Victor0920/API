@@ -10,7 +10,7 @@ const messageService = require("../services/message");
 
 const postMessages = async (req, res) => {
   try {
-    const botId = req.body.botId || "61a3d16b0ec2d91be729867a";
+    const botId = req.body.bot || "61cebea1b5886165bf128740";
     const userId = req.body.user;
     const language = req.body.language;
     const typeOfMessage = req.body.message.type;
